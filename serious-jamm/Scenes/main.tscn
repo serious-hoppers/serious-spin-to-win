@@ -1,0 +1,18 @@
+[gd_scene format=3 uid="uid://bbd6tncc27k6c"]
+
+[ext_resource type="Material" uid="uid://b06rpqkiq76yo" path="res://Materials/new_standard_material_3d.tres" id="1_jjgbg"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_7u77a"]
+material = ExtResource("1_jjgbg")
+
+[node name="Node3D" type="Node3D" unique_id=1579627271]
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=1914611534]
+transform = Transform3D(0.9578626, -0.17044991, 0.23118415, -1.8599493e-09, 0.8048834, 0.5934331, -0.28722686, -0.5684273, 0.7709678, 0.62839496, 1.3505176, 1.683851)
+
+[node name="Camera3D" type="Camera3D" parent="." unique_id=720831789]
+transform = Transform3D(0.70710677, -0.35355338, 0.6123724, 0, 0.8660254, 0.5, -0.70710677, -0.35355338, 0.6123724, 1, 1, 1)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=1314460694]
+material_override = ExtResource("1_jjgbg")
+mesh = SubResource("BoxMesh_7u77a")

@@ -1,27 +1,54 @@
 name: "godot-ci export"
-
-#on: push
-#TODO: this is just a test
+ 
 on:
   push:
     branches:
       - main
+    tags:
+      - "v*"
   pull_request:
     types: [opened, reopened, synchronize]
     branches:
       - main
-
+ 
 # NOTE: If your `project.godot` is at the repository root, set `PROJECT_PATH` below to ".".
-
+ 
 env:
   GODOT_VERSION: 4.3
   EXPORT_NAME: serious-jamm
   PROJECT_PATH: serious-jamm
-
+ 
 jobs:
+  test-compile:
+    name: GDScript Compile Check
+    runs-on: ubuntu-24.04
+    container:
+      image: barichello/godot-ci:4.3
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          lfs: true
+      - name: Setup
+        run: |
+          mkdir -v -p ~/.local/share/godot/export_templates/
+          mkdir -v -p ~/.config/
+          mv /root/.config/godot ~/.config/godot
+          mv /root/.local/share/godot/export_templates/${GODOT_VERSION}.stable ~/.local/share/godot/export_templates/${GODOT_VERSION}.stable
+      - name: GDScript Compile Check
+        run: |
+          cd $PROJECT_PATH
+          godot --headless --quit-after 10 2>&1 | tee /tmp/godot-check.log
+          # Exit non-zero if any script errors were found
+          if grep -qiE "error|script failed|parse error" /tmp/godot-check.log; then
+            echo "Script errors detected!"
+            exit 1
+          fi
+ 
   export-windows:
     name: Windows Export
-    runs-on: ubuntu-24.04  # Use 24.04 with godot 4
+    needs: test-compile
+    runs-on: ubuntu-24.04
     container:
       image: barichello/godot-ci:4.3
     steps:
@@ -46,10 +73,11 @@ jobs:
         with:
           name: windows
           path: build/windows
-
+ 
   export-linux:
     name: Linux Export
-    runs-on: ubuntu-24.04  # Use 24.04 with godot 4
+    needs: test-compile
+    runs-on: ubuntu-24.04
     container:
       image: barichello/godot-ci:4.3
     steps:
@@ -72,10 +100,11 @@ jobs:
         with:
           name: linux
           path: build/linux
-
+ 
   export-web:
     name: Web Export
-    runs-on: ubuntu-24.04  # Use 24.04 with godot 4
+    needs: test-compile
+    runs-on: ubuntu-24.04
     container:
       image: barichello/godot-ci:4.3
     steps:
@@ -104,12 +133,13 @@ jobs:
       - name: Deploy to GitHub Pages 🚀
         uses: JamesIves/github-pages-deploy-action@releases/v4
         with:
-          branch: gh-pages # The branch the action should deploy to.
-          folder: build/web # The folder the action should deploy.
-
+          branch: gh-pages
+          folder: build/web
+ 
   export-mac:
     name: Mac Export
-    runs-on: ubuntu-24.04  # Use 24.04 with godot 4
+    needs: test-compile
+    runs-on: ubuntu-24.04
     container:
       image: barichello/godot-ci:4.3
     steps:
@@ -132,3 +162,39 @@ jobs:
         with:
           name: mac
           path: build/mac
+ 
+  create-release:
+    name: Create GitHub Release
+    needs: [export-windows, export-linux, export-web, export-mac]
+    runs-on: ubuntu-24.04
+    # Only run when a version tag is pushed
+    if: startsWith(github.ref, 'refs/tags/v')
+    permissions:
+      contents: write
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+ 
+      - name: Zip platform builds
+        run: |
+          cd artifacts
+          zip -r ../serious-jamm-windows.zip windows/
+          zip -r ../serious-jamm-linux.zip linux/
+          zip -r ../serious-jamm-web.zip web/
+          # Mac export is already a zip, just rename for clarity
+          cp mac/$EXPORT_NAME.zip ../serious-jamm-mac.zip
+ 
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: ${{ github.ref_name }}
+          draft: false
+          prerelease: false
+          generate_release_notes: true
+          files: |
+            serious-jamm-windows.zip
+            serious-jamm-linux.zip
+            serious-jamm-web.zip
+            serious-jamm-mac.zip
