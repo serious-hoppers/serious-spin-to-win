@@ -14,6 +14,7 @@ func enter():
 ## @override
 func exit():
 	super()
+	await action_menu_panel_controller.hide()
 
 
 ## @override
@@ -22,6 +23,13 @@ func on_fire(e: int):
 		confirm()
 	else:
 		cancel()
+		
+		
+func on_move(e: Vector2i):
+	if e.x > 0 or e.y > 0:
+		action_menu_panel_controller.next()
+	else:
+		action_menu_panel_controller.previous()
 		
 		
 func load_menu():

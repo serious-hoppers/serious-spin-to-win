@@ -6,6 +6,7 @@ signal play_action_event()
 signal restart_game_event()
 
 @export var input_controller: InputController
+@export var action_menu_panel_controller: ActionMenuPanelController
 @export var bullet_panel_controller: BulletCountPanelController
 
 @export var roulette: RouletteManager

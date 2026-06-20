@@ -2,8 +2,6 @@ extends BaseAbilityMenuState
 
 @export var perform_action_state: State
 
-var game_over: bool = false
-
 
 ## @override
 func enter():
@@ -15,14 +13,20 @@ func exit():
 	super()
 	
 
-func add_listeners():
-	_owner.input_controller.fire_event.connect(on_fire)
+func load_menu():
+	if menu_options.size() == 0:
+		menu_title = "Actions"
+		menu_options.append("Fire")
+		
+	action_menu_panel_controller.show(menu_title, menu_options)
+#	action_menu_panel_controller.set_locked(0, has_money)
 	
 	
-func remove_listeners():
-	_owner.input_controller.quit_event.disconnect(on_fire)
+func confirm():
+	match action_menu_panel_controller.selection:
+		0: _owner.state_machine.change_state(perform_action_state)  # We should provide arg to preface which action
+
+
+func cancel():
+	pass
 	
-	
-func on_fire(e: int):
-	print("Firing shot")
-	_owner.state_machine.change_state(perform_action_state)

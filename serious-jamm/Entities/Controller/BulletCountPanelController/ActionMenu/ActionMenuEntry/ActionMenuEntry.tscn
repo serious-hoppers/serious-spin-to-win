@@ -1,0 +1,46 @@
+[gd_scene load_steps=8 format=3 uid="uid://tlawya7ld76v"]
+
+[ext_resource type="Script" path="res://Scripts/ViewModelComponent/Poolable.gd" id="1_u4akv"]
+[ext_resource type="Script" path="res://Entities/ActionMenu/ActionMenuEntry/ActionMenuEntry.gd" id="2_icd5y"]
+[ext_resource type="Texture2D" uid="uid://dguyq0sebccw8" path="res://Textures/ui-TEXTURES_TO_REMOVE/MenuBullet.png" id="3_hw3oc"]
+[ext_resource type="Texture2D" uid="uid://c4b0yxvkbc24p" path="res://Textures/ui-TEXTURES_TO_REMOVE/MenuBulletSelected.png" id="4_2aep1"]
+[ext_resource type="Texture2D" uid="uid://cefhwfftwg5yv" path="res://Textures/ui-TEXTURES_TO_REMOVE/MenuBulletLocked.png" id="5_yfsbi"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_xq7ah"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_cdi8s"]
+
+[node name="Action Menu Entry" type="PanelContainer"]
+offset_right = 136.0
+offset_bottom = 26.0
+theme_override_styles/panel = SubResource("StyleBoxEmpty_xq7ah")
+script = ExtResource("1_u4akv")
+
+[node name="Entry" type="PanelContainer" parent="." node_paths=PackedStringArray("bullet", "label")]
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxEmpty_cdi8s")
+script = ExtResource("2_icd5y")
+bullet = NodePath("HBoxContainer/Bullet Rect")
+label = NodePath("HBoxContainer/Entry Label")
+normal_sprite = ExtResource("3_hw3oc")
+selected_sprite = ExtResource("4_2aep1")
+disabled_sprite = ExtResource("5_yfsbi")
+
+[node name="HBoxContainer" type="HBoxContainer" parent="Entry"]
+layout_mode = 2
+
+[node name="Bullet Rect" type="TextureRect" parent="Entry/HBoxContainer"]
+layout_mode = 2
+texture = ExtResource("3_hw3oc")
+expand_mode = 3
+
+[node name="Entry Label" type="Label" parent="Entry/HBoxContainer"]
+layout_mode = 2
+theme_override_colors/font_outline_color = Color(0.298039, 0.298039, 0.298039, 1)
+theme_override_constants/line_spacing = 3
+theme_override_constants/shadow_offset_x = 1
+theme_override_constants/shadow_offset_y = 1
+theme_override_constants/outline_size = 6
+theme_override_constants/shadow_outline_size = 1
+theme_override_font_sizes/font_size = 18
+text = "Action Entry"

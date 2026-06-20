@@ -1,4 +1,4 @@
-[gd_scene load_steps=14 format=3 uid="uid://bs7gf01a6h2ep"]
+[gd_scene load_steps=23 format=3 uid="uid://bs7gf01a6h2ep"]
 
 [ext_resource type="Script" path="res://Scripts/Rotator.gd" id="1_8r2si"]
 [ext_resource type="Script" path="res://Entities/Roulette/RouletteManager.gd" id="2_2s6kt"]
@@ -10,10 +10,47 @@
 [ext_resource type="Script" path="res://Entities/Controller/BulletCountPanelController/BulletCountPanelController.gd" id="7_qgesh"]
 [ext_resource type="Script" path="res://Scripts/StatPanel.gd" id="8_hn1eh"]
 [ext_resource type="Script" path="res://Entities/GameState/GameOverState.gd" id="8_veq4s"]
+[ext_resource type="Script" path="res://Entities/ActionMenu/ActionMenuPanelController.gd" id="9_tfpec"]
 [ext_resource type="AudioStream" uid="uid://scym8mdde7h7" path="res://Assets/jixaw-metal-pipe-falling-sound.mp3" id="10_dw0e1"]
+[ext_resource type="Script" path="res://Entities/ActionMenu/ActionMenuPanel.gd" id="10_iyve1"]
 [ext_resource type="VideoStream" path="res://Assets/22t3rcim2kf1b1_converted.ogv" id="10_l5oyo"]
+[ext_resource type="PackedScene" uid="uid://tlawya7ld76v" path="res://Entities/ActionMenu/ActionMenuEntry/ActionMenuEntry.tscn" id="10_wyy64"]
+[ext_resource type="Script" path="res://Scripts/UI/PanelAnchor.gd" id="11_dxhnq"]
+[ext_resource type="Texture2D" uid="uid://c87wfavqdsg5x" path="res://Textures/ui-TEXTURES_TO_REMOVE/AbilityMenu.png" id="11_ohiut"]
+[ext_resource type="Script" path="res://Entities/Controller/GameObjectPoolController.gd" id="17_vtp1d"]
 
 [sub_resource type="BoxMesh" id="BoxMesh_0s0p7"]
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_j1sx1"]
+content_margin_left = 18.0
+content_margin_top = 13.0
+content_margin_right = 12.0
+content_margin_bottom = 16.0
+texture = ExtResource("11_ohiut")
+texture_margin_left = 44.0
+texture_margin_top = 42.0
+texture_margin_right = 1.0
+texture_margin_bottom = 32.0
+
+[sub_resource type="Resource" id="Resource_vhx1y"]
+script = ExtResource("11_dxhnq")
+anchor_name = "Hide"
+anchor = 2
+parent_anchor = 3
+offset = Vector2(0, -20)
+duration = 0.5
+trans = 0
+anchor_ease = 2
+
+[sub_resource type="Resource" id="Resource_73m1r"]
+script = ExtResource("11_dxhnq")
+anchor_name = "Show"
+anchor = 3
+parent_anchor = 3
+offset = Vector2(0, -20)
+duration = 0.5
+trans = 0
+anchor_ease = 2
 
 [node name="Demo-roulette" type="Node3D"]
 metadata/_edit_vertical_guides_ = [39.0]
@@ -28,9 +65,10 @@ script = ExtResource("1_8r2si")
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
 transform = Transform3D(0.866025, -0.25, 0.433013, 0, 0.866025, 0.5, -0.5, -0.433013, 0.75, 0, 0, 0)
 
-[node name="GameManager" type="Node" parent="." node_paths=PackedStringArray("input_controller", "bullet_panel_controller", "roulette", "state_machine", "start_state")]
+[node name="GameManager" type="Node" parent="." node_paths=PackedStringArray("input_controller", "action_menu_panel_controller", "bullet_panel_controller", "roulette", "state_machine", "start_state")]
 script = ExtResource("3_tlvjd")
 input_controller = NodePath("InputController")
+action_menu_panel_controller = NodePath("ActionsMenuPanelController")
 bullet_panel_controller = NodePath("BulletCountPanelController")
 roulette = NodePath("RouletteManager")
 state_machine = NodePath("StateMachine")
@@ -58,23 +96,44 @@ game_over_state = NodePath("../GameOverState")
 script = ExtResource("8_veq4s")
 select_action_state = NodePath("../SelectActionState")
 
-[node name="ActionsMenuPanelController" type="Node" parent="GameManager"]
+[node name="ActionsMenuPanelController" type="Node" parent="GameManager" node_paths=PackedStringArray("title_label", "panel", "entry_vbox")]
+script = ExtResource("9_tfpec")
+entry_prefab = ExtResource("10_wyy64")
+title_label = NodePath("Actions Menu Panel/Panel VBox/Title Margin/Title Text")
+panel = NodePath("Actions Menu Panel")
+entry_vbox = NodePath("Actions Menu Panel/Panel VBox/Entry VBox")
 
 [node name="Actions Menu Panel" type="PanelContainer" parent="GameManager/ActionsMenuPanelController"]
-offset_right = 40.0
-offset_bottom = 40.0
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -132.0
+offset_top = -66.0
+offset_bottom = 1.0
+grow_horizontal = 0
+grow_vertical = 0
+theme_override_styles/panel = SubResource("StyleBoxTexture_j1sx1")
+script = ExtResource("10_iyve1")
+anchor_list = Array[ExtResource("11_dxhnq")]([SubResource("Resource_vhx1y"), SubResource("Resource_73m1r")])
 
 [node name="Panel VBox" type="VBoxContainer" parent="GameManager/ActionsMenuPanelController/Actions Menu Panel"]
 layout_mode = 2
+theme_override_constants/separation = 3
 
 [node name="Title Margin" type="MarginContainer" parent="GameManager/ActionsMenuPanelController/Actions Menu Panel/Panel VBox"]
 layout_mode = 2
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_bottom = 11
 
-[node name="Title Label" type="Label" parent="GameManager/ActionsMenuPanelController/Actions Menu Panel/Panel VBox/Title Margin"]
+[node name="Title Text" type="Label" parent="GameManager/ActionsMenuPanelController/Actions Menu Panel/Panel VBox/Title Margin"]
 layout_mode = 2
+text = "Menu Title"
 
 [node name="Entry VBox" type="VBoxContainer" parent="GameManager/ActionsMenuPanelController/Actions Menu Panel/Panel VBox"]
 layout_mode = 2
+theme_override_constants/separation = 5
 
 [node name="BulletCountPanelController" type="Node" parent="GameManager" node_paths=PackedStringArray("stat_panel")]
 script = ExtResource("7_qgesh")
@@ -98,7 +157,6 @@ theme_override_font_sizes/font_size = 48
 text = "1 left"
 
 [node name="GameOver Label" type="Label" parent="GameManager/BulletCountPanelController/CenterContainer"]
-visible = false
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 0, 0, 1)
 theme_override_font_sizes/font_size = 48
@@ -111,3 +169,7 @@ paused = true
 
 [node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="GameManager/BulletCountPanelController/CenterContainer"]
 stream = ExtResource("10_dw0e1")
+
+[node name="PoolController" type="Node" parent="GameManager"]
+unique_name_in_owner = true
+script = ExtResource("17_vtp1d")

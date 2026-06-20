@@ -8,14 +8,6 @@ func enter():
 	_owner.game_over_event.emit()
 
 
-func add_listeners():
-	_owner.input_controller.fire_event.connect(on_fire)
-	
-	
-func remove_listeners():
-	_owner.input_controller.fire_event.disconnect(on_fire)
-
-
 func on_fire(e: int):
 	on_game_reset()
 		

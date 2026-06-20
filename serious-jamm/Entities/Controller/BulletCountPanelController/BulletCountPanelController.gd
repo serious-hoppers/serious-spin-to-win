@@ -13,6 +13,7 @@ func _ready() -> void:
 	_owner.game_over_event.connect(game_over_display)
 	_owner.restart_game_event.connect(update_display)
 
+
 func _exit_tree() -> void:
 	_owner.play_action_event.disconnect(update_display)
 	_owner.game_over_event.disconnect(game_over_display)
