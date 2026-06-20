@@ -1,0 +1,113 @@
+[gd_scene load_steps=14 format=3 uid="uid://bs7gf01a6h2ep"]
+
+[ext_resource type="Script" path="res://Scripts/Rotator.gd" id="1_8r2si"]
+[ext_resource type="Script" path="res://Entities/Roulette/RouletteManager.gd" id="2_2s6kt"]
+[ext_resource type="Script" path="res://Entities/GameManager.gd" id="3_tlvjd"]
+[ext_resource type="Script" path="res://Entities/Controller/InputController.gd" id="3_v4ysg"]
+[ext_resource type="Script" path="res://Scripts/StateMachine/StateMachine.gd" id="4_sxmeo"]
+[ext_resource type="Script" path="res://Entities/GameState/SelectActionState.gd" id="6_nu72b"]
+[ext_resource type="Script" path="res://Entities/GameState/PerformActionState.gd" id="7_d3kr4"]
+[ext_resource type="Script" path="res://Entities/Controller/BulletCountPanelController/BulletCountPanelController.gd" id="7_qgesh"]
+[ext_resource type="Script" path="res://Scripts/StatPanel.gd" id="8_hn1eh"]
+[ext_resource type="Script" path="res://Entities/GameState/GameOverState.gd" id="8_veq4s"]
+[ext_resource type="AudioStream" uid="uid://scym8mdde7h7" path="res://Assets/jixaw-metal-pipe-falling-sound.mp3" id="10_dw0e1"]
+[ext_resource type="VideoStream" path="res://Assets/22t3rcim2kf1b1_converted.ogv" id="10_l5oyo"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_0s0p7"]
+
+[node name="Demo-roulette" type="Node3D"]
+metadata/_edit_vertical_guides_ = [39.0]
+
+[node name="Camera3D" type="Camera3D" parent="."]
+transform = Transform3D(0.707107, -0.353553, 0.612372, 0, 0.866025, 0.5, -0.707107, -0.353553, 0.612372, 2, 2, 2)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+mesh = SubResource("BoxMesh_0s0p7")
+script = ExtResource("1_8r2si")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(0.866025, -0.25, 0.433013, 0, 0.866025, 0.5, -0.5, -0.433013, 0.75, 0, 0, 0)
+
+[node name="GameManager" type="Node" parent="." node_paths=PackedStringArray("input_controller", "bullet_panel_controller", "roulette", "state_machine", "start_state")]
+script = ExtResource("3_tlvjd")
+input_controller = NodePath("InputController")
+bullet_panel_controller = NodePath("BulletCountPanelController")
+roulette = NodePath("RouletteManager")
+state_machine = NodePath("StateMachine")
+start_state = NodePath("StateMachine/SelectActionState")
+
+[node name="InputController" type="Node" parent="GameManager"]
+script = ExtResource("3_v4ysg")
+
+[node name="RouletteManager" type="Node" parent="GameManager"]
+script = ExtResource("2_2s6kt")
+
+[node name="StateMachine" type="Node" parent="GameManager"]
+script = ExtResource("4_sxmeo")
+
+[node name="SelectActionState" type="Node" parent="GameManager/StateMachine" node_paths=PackedStringArray("perform_action_state")]
+script = ExtResource("6_nu72b")
+perform_action_state = NodePath("../PerformActionState")
+
+[node name="PerformActionState" type="Node" parent="GameManager/StateMachine" node_paths=PackedStringArray("select_action_state", "game_over_state")]
+script = ExtResource("7_d3kr4")
+select_action_state = NodePath("../SelectActionState")
+game_over_state = NodePath("../GameOverState")
+
+[node name="GameOverState" type="Node" parent="GameManager/StateMachine" node_paths=PackedStringArray("select_action_state")]
+script = ExtResource("8_veq4s")
+select_action_state = NodePath("../SelectActionState")
+
+[node name="ActionsMenuPanelController" type="Node" parent="GameManager"]
+
+[node name="Actions Menu Panel" type="PanelContainer" parent="GameManager/ActionsMenuPanelController"]
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="Panel VBox" type="VBoxContainer" parent="GameManager/ActionsMenuPanelController/Actions Menu Panel"]
+layout_mode = 2
+
+[node name="Title Margin" type="MarginContainer" parent="GameManager/ActionsMenuPanelController/Actions Menu Panel/Panel VBox"]
+layout_mode = 2
+
+[node name="Title Label" type="Label" parent="GameManager/ActionsMenuPanelController/Actions Menu Panel/Panel VBox/Title Margin"]
+layout_mode = 2
+
+[node name="Entry VBox" type="VBoxContainer" parent="GameManager/ActionsMenuPanelController/Actions Menu Panel/Panel VBox"]
+layout_mode = 2
+
+[node name="BulletCountPanelController" type="Node" parent="GameManager" node_paths=PackedStringArray("stat_panel")]
+script = ExtResource("7_qgesh")
+stat_panel = NodePath("CenterContainer")
+
+[node name="CenterContainer" type="CenterContainer" parent="GameManager/BulletCountPanelController" node_paths=PackedStringArray("bullets_label", "game_over_label", "video", "audio")]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("8_hn1eh")
+bullets_label = NodePath("Bullets Label")
+game_over_label = NodePath("GameOver Label")
+video = NodePath("VideoStreamPlayer")
+audio = NodePath("AudioStreamPlayer")
+
+[node name="Bullets Label" type="Label" parent="GameManager/BulletCountPanelController/CenterContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 48
+text = "1 left"
+
+[node name="GameOver Label" type="Label" parent="GameManager/BulletCountPanelController/CenterContainer"]
+visible = false
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0, 0, 1)
+theme_override_font_sizes/font_size = 48
+text = "Game Over"
+
+[node name="VideoStreamPlayer" type="VideoStreamPlayer" parent="GameManager/BulletCountPanelController/CenterContainer"]
+layout_mode = 2
+stream = ExtResource("10_l5oyo")
+paused = true
+
+[node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="GameManager/BulletCountPanelController/CenterContainer"]
+stream = ExtResource("10_dw0e1")
