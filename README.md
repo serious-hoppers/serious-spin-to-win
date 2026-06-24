@@ -1,4 +1,4 @@
 # serious-godot-jam
 A very serious jam
 
-Fuck it IM pushing to main
+God I Love Frogs Man
